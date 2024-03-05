@@ -1,0 +1,14 @@
+{
+  "name": "factureideas",
+  "version": "1.0.0",
+  "description": "Cosider test developer",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "Yasser Khelassi",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.3"
+  }
+}
