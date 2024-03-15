@@ -2,29 +2,6 @@ const express = require('express');
 const router = express.Router();
 const Idea = require('../models/Idea');
 
-const ideas = [
-  {
-    id: 1,
-    text: 'Positive NewsLetter, a newsletter that only shares positive, uplifting news',
-    tag: 'Technology',
-    username: 'TonyStark',
-    date: '2022-01-02',
-  },
-  {
-    id: 2,
-    text: 'Milk cartons that turn a different color the older that your milk is getting',
-    tag: 'Inventions',
-    username: 'SteveRogers',
-    date: '2022-01-02',
-  },
-  {
-    id: 3,
-    text: 'ATM location app which lets you know where the closest ATM is and if it is in service',
-    tag: 'Software',
-    username: 'BruceBanner',
-    date: '2022-01-02',
-  },
-];
   
 // GET All facutre
 router.get('/', async (req, res) => {
@@ -67,34 +44,54 @@ router.post('/', async (req, res) => {
   res.json({ success: true, data: idea });
 });
 
+
 // update an idea
 router.put('/:id', async (req, res) => {
   try {
-    const updateIdea = await Idea.findByIdAndUpdate(
-      req.params.id,
-      {
-        $set: {
-          text: req.body.text,
-          tag: req.body.tag
-        }
-      },
-      { new: true }
-    );
-      res.json({ succes: true, data: updateIdea });
+    const idea = await Idea.findById(req.params.id);
+    
+    if (idea.username === req.body.username) {
+      const updateIdea = await Idea.findByIdAndUpdate(
+        req.params.id,
+        {
+          $set: {
+            text: req.body.text,
+            tag: req.body.tag
+          }
+        },
+        { new: true }
+      );
+        return res.json({ succes: true, data: updateIdea });
+    }
+
+    // Username do not match
+    res.status(403).json({ succes: false, error: 'You are not authorized to update this resource'});
+
   } catch (error) {
     console.log(error);
     res.json({ succes: false, error: 'Something Went Wrong' });
   }
 });
 
+
 // delete an idea
 router.delete('/:id', async (req, res) => {
   try {
-    await Idea.findByIdAndDelete(req.params.id);
-    res.json({ succes: true, data: {} });
+    const idea = await Idea.findById(req.params.id);
+
+    // Match the username
+    if (idea.username === req.body.username) {
+      await Idea.findByIdAndDelete(req.params.id);
+      return res.json({ succes: true, data: {} });
+    
+    }
+
+    // Username do not match
+    res.status(403).json({ succes: false, error: 'You are not authorized to delete this resource'});
+
   } catch (error) {
     console.log(error);
-    res.json({ succes: false, error: 'Something Went Wrong' });
+    res.status(500).json({ succes: false, error: 'Something Went Wrong' });
   }
 });
 
